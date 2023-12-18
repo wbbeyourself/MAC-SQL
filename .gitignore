@@ -1,0 +1,17 @@
+.DS_Store
+__pycache__/
+*/__pycache__/
+tmp/
+*.pyc
+.idea/
+.vscode/
+core/magic.api.py
+core/magic.config.json
+outputs/
+test.py
+baseline/
+tmp/
+dev_databases/
+train_databases/
+database/
+*.sqlite
