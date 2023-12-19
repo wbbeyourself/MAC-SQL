@@ -8,12 +8,12 @@ try:
     from core import api
     LLM_API_FUC = api.safe_call_llm
     INIT_LOG__PATH_FUNC = api.init_log_path
-    print(f"Use func from core.api in chat_manager")
+    print(f"Use func from core.api in chat_manager.py")
 except:
     from core import llm
     LLM_API_FUC = llm.safe_call_llm
     INIT_LOG__PATH_FUNC = llm.init_log_path
-    print(f"Use func from core.llm in chat_manager")
+    print(f"Use func from core.llm in chat_manager.py")
 
 import time
 from pprint import pprint

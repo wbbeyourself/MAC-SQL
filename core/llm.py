@@ -43,7 +43,9 @@ def init_log_path(my_log_path):
 def api_func(prompt:str):
     global MODEL_NAME
     if MODEL_NAME is None:
-        MODEL_NAME = 'gpt-4-32k'
+        # MODEL_NAME = 'gpt-4-32k' # 0613版本
+        MODEL_NAME = 'gpt-4' # 0613版本
+        # MODEL_NAME = 'gpt-35-turbo-16k' # 0613版本
     print(f"\nUse OpenAI model: {MODEL_NAME}\n")
     response = openai.ChatCompletion.create(
         engine=MODEL_NAME,

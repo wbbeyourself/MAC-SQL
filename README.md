@@ -27,7 +27,7 @@ Note: we use `openai==0.28.1`, which use `openai.ChatCompletion.create` to call 
 
 2. Edit openai config at **core/api_config.py**, and set related environment variables of Azure OpenAI API.
 
-Currently, we use `gpt-4-32k` by default.
+Currently, we use `gpt-4` (8k version) by default.
 
 ```bash
 export OPENAI_API_BASE="YOUR_OPENAI_API_BASE"
