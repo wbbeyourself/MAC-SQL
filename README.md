@@ -1,95 +1,55 @@
 ## 📖Introduction
 
-This is the official repository for the paper ["MAC-SQL: Multi-Agent Collaboration for text-to-SQL task"](https://arxiv.org/abs/2312.66666).
+This is the official repository for the paper ["MAC-SQL: Multi-Agent Collaboration for text-to-SQL task"](https://arxiv.org/abs/2312.11242).
 
 In this paper, we propose a multi-agent collaborative Text-to-SQL framework MAC-SQL, which comprises three agents: the **Selector**, the **Decomposer**, and the **Refiner**.
 
 <img src="./assets/framework.jpg" align="middle" width="95%">
 
+
+# 🔥 Updates
+- [**2023-12-19**] We released our first version [paper](https://arxiv.org/abs/2312.11242), [code](https://github.com/wbbeyourself/MAC-SQL). Check it out!
+
+
+
 ## ⚡Environment
-
-
 
 1. Config your local environment.
 
 ```bash
-# Use conda to create environment.
-conda create -n macsql python=3.8 -y
+conda create -n macsql python=3.9 -y
 conda activate macsql
-# Install the requirements.
 pip install -r requirements.txt
+python -c "import nltk; nltk.download('punkt')"
 ```
 
-2. Config your API_KEY, which used in ```core/api_config.py```.
+Note: we use `openai==0.28.1`, which use `openai.ChatCompletion.create` to call api.
+
+2. Edit openai config at **core/api_config.py**, and set related environment variables of Azure OpenAI API.
+
+Currently, we use `gpt-4-32k` by default.
 
 ```bash
-set OPENAI_API_BASE = <YOUR_OPENAI_API_BASE>
-set OPENAI_API_KEY = <YOUR_OPENAI_API_KEY>
+export OPENAI_API_BASE="YOUR_OPENAI_API_BASE"
+export OPENAI_API_KEY="YOUR_OPENAI_API_KEY"
 ```
 
 ## 🔧 Data Preparation
 
+In order to prepare the data more quickly, I have packaged the files including the databases of the BIRD dataset and the Spider dataset into `data.zip` and uploaded them. 
+All files were downloaded on December 19, 2023, ensuring they are the latest version at that moment. 
+The download links are available on [Baidu Disk](https://pan.baidu.com/s/1LkOtJEjNCG-N-ozq4mbuag?pwd=6ak5) and [Google Drive](https://drive.google.com/file/d/1dXHsYDziA8NwZuyjDaFV3j9CPjYdNuyP/view?usp=drive_link).
 
+After downloading the `data.zip` file, you should delete the existing data folder in the project directory and replace it with the unzipped data folder from `data.zip`.
 
-- Download [BIRD dev](https://bird-bench.oss-cn-beijing.aliyuncs.com/dev.zip) and then put in ```<REPO_DIR>/data/bird```
-
-- Download [Spider dev](https://drive.google.com/uc?export=download&id=1TqleXec_OykOYFREKKtschzY29dUcVAQ) and then put in ```<REPO_DIR>/data/spider```
-
-- The expected repo structure should be like as:
-    ```bash
-    MAC-SQL
-    ├─data
-      ├─bird
-      │  │─dev.json
-      │  │─dev.sql
-      │  │─dev_gold.sql
-      │  │─dev_tables.json
-      │  └─dev_databases
-      │      ├─california_schools
-      │      │  │─.DS_Store
-      │      │  │─california_schools.sqlite
-      │      │  │
-      │      │  └─database_description
-      │      │     │─frpm.csv
-      │      │     │─satscores.csv
-      │      │     └─schools.csv
-      |      ├─... 
-      └─spider
-          │─dev.json
-          │─dev_gold.sql
-          │─README.txt
-          │─tables.json
-          └─database
-              ├─academic
-              │    │─academic.sqlite
-              │    └─schema.sql
-              │
-              ├─...
-    
-    ```
 
 ## 🚀 Run
 
-
-We support different platforms in relative scripts. 
-
+The run script will first run 5 examples in Spider to check environment.
 You should open code comments for different usage.
 
-- On `Linux/Mac OS`
-```bash
-# run bird
-sh run_bird.sh
-# run spider
-sh run_spider.sh
-```
-
-- On `Windows OS`
-```bash
-# run bird
-run_bird.bat
-# run spider
-run_spider.bat
-```
+- `run.sh` for Linux/Mac OS
+- `run.bat` for Windows OS
 
 ## 📝Evaluation Dataset
 
@@ -105,17 +65,17 @@ Refer to our paper for the details.
 ## 💬Citation
 
 
-
 If you find our work is helpful, please cite as:
 
 ```text
-@article{wang2023macsql,
-  title={MAC-SQL: Multi-Agent Collaboration for text-to-SQL task},
-  author={Wang, Bing etc.},
-  journal={arXiv preprint arXiv:2312.66666},
-  year={2023}
+@misc{wang2023macsql,
+      title={MAC-SQL: Multi-Agent Collaboration for Text-to-SQL}, 
+      author={Bing Wang and Changyu Ren and Jian Yang and Xinnian Liang and Jiaqi Bai and Qian-Wen Zhang and Zhao Yan and Zhoujun Li},
+      year={2023},
+      eprint={2312.11242},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
 }
-
 ```
 
 ## 👍Contributing

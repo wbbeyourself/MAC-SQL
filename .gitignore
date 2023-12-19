@@ -9,9 +9,14 @@ core/magic.api.py
 core/magic.config.json
 outputs/
 test.py
+api.py
 baseline/
 tmp/
+data/bird/
+data/spider/
+data/foo/
 dev_databases/
+dev_databases.zip
 train_databases/
 database/
 *.sqlite

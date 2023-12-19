@@ -1,0 +1,8 @@
+openai==0.28.1
+transformers==4.33.0
+requests
+pandas
+tiktoken
+tqdm
+nltk
+func_timeout
