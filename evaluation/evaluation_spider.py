@@ -501,7 +501,7 @@ def print_scores(scores, etype, include_turn_acc=True):
             print_formated_s("exact match", exact_scores, '{:<20.3f}')
 
 
-def evaluate(gold, predict, db_dir, etype, kmaps):
+def evaluate(gold, predict, db_dir, etype, kmaps, plug_value, keep_distinct, progress_bar_for_each_datapoint):
 
     with open(gold) as f:
         glist = []
@@ -561,8 +561,8 @@ def evaluate(gold, predict, db_dir, etype, kmaps):
     gold_pred_map_lst = []
     
     for i, (p, g) in enumerate(zip(plist, glist)):
-        # print(f"len(plist): {len(plist)}; len(glist): {len(glist)})")
-        # print('Evaluating %dth prediction' % (i))
+        if (i + 1) % 10 == 0:
+            print('Evaluating %dth prediction' % (i + 1))
         scores['joint_all']['count'] += 1
         turn_scores = {"exec": [], "exact": []}
         
@@ -623,7 +623,8 @@ def evaluate(gold, predict, db_dir, etype, kmaps):
                 }
 
             if etype in ["all", "exec"]:
-                exec_score = eval_exec_match(db=db, p_str=p_str, g_str=g_str)
+                exec_score = eval_exec_match(db=db, p_str=p_str, g_str=g_str, plug_value=plug_value,
+                                             keep_distinct=keep_distinct, progress_bar_for_each_datapoint=progress_bar_for_each_datapoint)
                 if exec_score:
                     scores[hardness]['exec'] += 1
                     scores[turn_id]['exec'] += 1
@@ -955,6 +956,12 @@ if __name__ == "__main__":
     parser.add_argument('--etype', dest='etype', type=str, default='exec',
                         help="evaluation type, exec for test suite accuracy, match for the original exact set match accuracy",
                         choices=('all', 'exec', 'match'))
+    parser.add_argument('--plug_value', default=False, action='store_true',
+                        help='whether to plug in the gold value into the predicted query; suitable if your model does not predict values.')
+    parser.add_argument('--keep_distinct', default=False, action='store_true',
+                        help='whether to keep distinct keyword during evaluation. default is false.')
+    parser.add_argument('--progress_bar_for_each_datapoint', default=False, action='store_true',
+                        help='whether to print progress bar of running test inputs for each datapoint')
     args = parser.parse_args()
 
     # only evaluting exact match needs this argument
@@ -963,4 +970,4 @@ if __name__ == "__main__":
         assert args.table is not None, 'table argument must be non-None if exact set match is evaluated'
         kmaps = build_foreign_key_map_from_json(args.table)
 
-    evaluate(args.gold, args.pred, args.db, args.etype, kmaps)
+    evaluate(args.gold, args.pred, args.db, args.etype, kmaps, args.plug_value, args.keep_distinct, args.progress_bar_for_each_datapoint)

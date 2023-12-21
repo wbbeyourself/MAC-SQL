@@ -40,12 +40,16 @@ echo "Generate SQL on env test data done!"
 @REM    --output_file "./outputs/spider/output_spider.json" ^
 @REM    --log_file "./outputs/spider/log.txt"
 
-@REM #################### Spider dev 【evaluation】 count=1034 #########
+@REM #################### Spider dev 【evaluation】EX and EM count=1034 #########
 @REM python ./evaluation/evaluation_spider.py ^
 @REM    --gold "./data/spider/dev_gold.sql" ^
-@REM    --pred "./outputs/spider/pred_dev.sql" ^
 @REM    --db "./data/spider/database" ^
-@REM    --etype "exec"
+@REM    --table "./data/spider/tables.json" ^
+@REM    --pred "./outputs/spider/pred_dev.sql" ^
+@REM    --etype "all" ^
+@REM    --plug_value ^
+@REM    --keep_distinct ^
+@REM    --progress_bar_for_each_datapoint
 
 
 echo "Done!"

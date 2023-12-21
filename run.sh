@@ -39,12 +39,15 @@ echo "Generate SQL on env test data done!"
 #    --output_file "./outputs/spider/output_spider.json" \
 #    --log_file "./outputs/spider/log.txt"
 
-# #################### Spider dev 【evaluation】 count=1034 #########
+# #################### Spider dev 【evaluation】EX and EM count=1034 #########
 # python ./evaluation/evaluation_spider.py \
 #    --gold "./data/spider/dev_gold.sql" \
-#    --pred "./outputs/spider/pred_dev.sql" \
 #    --db "./data/spider/database" \
-#    --etype "exec"
-
+#    --table "./data/spider/tables.json" \
+#    --pred "./outputs/spider/pred_dev.sql" \
+#    --etype "all" \
+#    --plug_value \
+#    --keep_distinct \
+#    --progress_bar_for_each_datapoint
 
 echo "Done!"

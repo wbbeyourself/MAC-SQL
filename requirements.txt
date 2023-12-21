@@ -1,8 +1,10 @@
 openai==0.28.1
 transformers==4.33.0
+func_timeout
+sqlparse
 requests
 pandas
 tiktoken
 tqdm
 nltk
-func_timeout
+flask

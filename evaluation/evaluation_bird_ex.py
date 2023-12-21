@@ -37,6 +37,7 @@ def execute_sql(predicted_sql,ground_truth, db_path):
     cursor.execute(ground_truth)
     ground_truth_res = cursor.fetchall()
     res = 0
+    # todo: this should permute column order!
     if set(predicted_res) == set(ground_truth_res):
         res = 1
     return res

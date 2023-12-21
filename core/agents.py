@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from core.utils import parse_json, parse_sql, parse_qa_pairs, parse_single_sql, add_prefix, get_files, load_json_file, extract_world_info, is_email
+from core.utils import parse_json, parse_sql, parse_qa_pairs, parse_single_sql, add_prefix, get_files, load_json_file, extract_world_info, is_email, is_valid_date_column
 
 
 LLM_API_FUC = None
@@ -125,16 +125,23 @@ class Selector(BaseAgent):
         return column_names, column_types
 
     
-    def _get_unique_column_values_str(self, cursor, table, column_names, column_types, json_column_names):
+    def _get_unique_column_values_str(self, cursor, table, column_names, column_types, 
+                                      json_column_names, is_key_column_lst):
 
         col_to_values_str_lst = []
         col_to_values_str_dict = {}
+
+        key_col_list = [json_column_names[i] for i, flag in enumerate(is_key_column_lst) if flag]
 
         len_column_names = len(column_names)
 
         for idx, column_name in enumerate(column_names):
             # 查询每列的 distinct value, 从指定的表中选择指定列的值，并按照该列的值进行分组。然后按照每个分组中的记录数量进行降序排序。
             # print(f"In _get_unique_column_values_str, processing column: {idx}/{len_column_names} col_name: {column_name} of table: {table}", flush=True)
+
+            # skip pk and fk
+            if column_name in key_col_list:
+                continue
             
             lower_column_name: str = column_name.lower()
             # if lower_column_name ends with [id, email, url], just use empty str
@@ -160,12 +167,17 @@ class Selector(BaseAgent):
             col_to_values_str_dict[column_name] = values_str
 
 
-        for column_name in json_column_names:
+        for k, column_name in enumerate(json_column_names):
             values_str = ''
             # print(f"column_name: {column_name}")
             # print(f"col_to_values_str_dict: {col_to_values_str_dict}")
 
-            if column_name in col_to_values_str_dict:
+            is_key = is_key_column_lst[k]
+
+            # pk or fk do not need value str
+            if is_key:
+                values_str = ''
+            elif column_name in col_to_values_str_dict:
                 values_str = col_to_values_str_dict[column_name]
             else:
                 print(col_to_values_str_dict)
@@ -204,8 +216,11 @@ class Selector(BaseAgent):
             
             for v in vals:
                 if not isinstance(v, str):
+                    
                     new_values.append(v)
                 else:
+                    if self.dataset_name == 'spider':
+                        v = v.strip()
                     if v == '': # exclude empty string
                         continue
                     elif ('https://' in v) or ('http://' in v): # exclude url
@@ -227,6 +242,10 @@ class Selector(BaseAgent):
         
         vals = vals[:6]
 
+        is_date_column = is_valid_date_column(vals)
+        if is_date_column:
+            vals = vals[:1]
+
         if has_null:
             vals.insert(0, None)
         
@@ -242,6 +261,16 @@ class Selector(BaseAgent):
 
         db_dict = self.db2dbjsons[db_id]
 
+        # todo: gather all pk and fk id list
+        important_key_id_lst = []
+        keys = db_dict['primary_keys'] + db_dict['foreign_keys']
+        for col_id in keys:
+            if isinstance(col_id, list):
+                important_key_id_lst.extend(col_id)
+            else:
+                important_key_id_lst.append(col_id)
+
+
         db_path = f"{self.data_path}/{db_id}/{db_id}.sqlite"
         conn = sqlite3.connect(db_path)
         conn.text_factory = lambda b: b.decode(errors="ignore")  # avoid gbk/utf8 error, copied from sql-eval.exec_eval
@@ -256,10 +285,15 @@ class Selector(BaseAgent):
             col2dec_lst = []
 
             pure_column_names_original_lst = []
+            is_key_column_lst = []
             for col_idx, (root_tb_idx, orig_col_name) in enumerate(all_column_names_original_lst):
                 if root_tb_idx != tb_idx:
                     continue
                 pure_column_names_original_lst.append(orig_col_name)
+                if col_idx in important_key_id_lst:
+                    is_key_column_lst.append(True)
+                else:
+                    is_key_column_lst.append(False)
                 full_col_name: str = all_column_names_full_lst[col_idx][1]
                 full_col_name = full_col_name.replace('_', ' ')
                 cur_desc_obj = [orig_col_name, full_col_name, '']
@@ -272,7 +306,7 @@ class Selector(BaseAgent):
 
             # column_names, column_types
             all_sqlite_column_names_lst, all_sqlite_column_types_lst = self._get_column_attributes(cursor, tb_name)
-            col_to_values_str_lst = self._get_unique_column_values_str(cursor, tb_name, all_sqlite_column_names_lst, all_sqlite_column_types_lst, pure_column_names_original_lst)
+            col_to_values_str_lst = self._get_unique_column_values_str(cursor, tb_name, all_sqlite_column_names_lst, all_sqlite_column_types_lst, pure_column_names_original_lst, is_key_column_lst)
             table_unique_column_values[tb_name] = col_to_values_str_lst
         
         # table_foreign_keys 处理起来麻烦一些
@@ -659,7 +693,7 @@ class Refiner(BaseAgent):
         sql_arg = add_prefix(error_info.get('sql'))
         sqlite_error = error_info.get('sqlite_error')
         exception_class = error_info.get('exception_class')
-        prompt = fixup_template.format(query=query, evidence=evidence, desc_str=schema_info, \
+        prompt = refiner_template.format(query=query, evidence=evidence, desc_str=schema_info, \
                                        fk_str=fk_info, sql=sql_arg, sqlite_error=sqlite_error, \
                                         exception_class=exception_class)
 
@@ -677,7 +711,7 @@ class Refiner(BaseAgent):
                         "fk_str": foreign keys of database,
                         "final_sql": generated SQL to be verified,
                         "db_id": database name to execute on}
-        :return: execution result and if need, fixup SQL according to error info
+        :return: execution result and if need, refine SQL according to error info
         """
         if message['send_to'] != self.name: return
         self._message = message
@@ -688,7 +722,7 @@ class Refiner(BaseAgent):
                                                             message.get('desc_str'), \
                                                             message.get('fk_str')
         error_info = self._execute_sql(old_sql, db_id)
-        if not self._is_need_refine(error_info):  # correct in one pass or fixup success
+        if not self._is_need_refine(error_info):  # correct in one pass or refine success
             message['try_times'] = message.get('try_times', 0) + 1
             message['pred'] = old_sql
             message['send_to'] = SYSTEM_NAME

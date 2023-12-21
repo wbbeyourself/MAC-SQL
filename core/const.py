@@ -593,7 +593,7 @@ FROM table_b
 """
 
 
-fixup_template = """
+refiner_template = """
 【Instruction】
 When executing SQL below, some errors occurred, please fix up SQL based on query and database info.
 Solve the task step by step if you need to. Using SQL format in the code block, and indicate script type in the code block.

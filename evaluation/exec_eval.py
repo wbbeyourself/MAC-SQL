@@ -6,7 +6,13 @@ import threading
 from typing import Tuple, Any, List, Set
 from itertools import product
 from collections import defaultdict
+import tqdm
 import random
+from parse import get_all_preds_for_execution, remove_distinct
+import time
+import pickle as pkl
+import subprocess
+from itertools import chain
 
 
 
@@ -175,10 +181,13 @@ def postprocess(query: str) -> str:
 # 0 if denotationally equivalent
 # 1 otherwise
 # the meaning of each auxillary argument can be seen in the parser definition in evaluation.py
-def eval_exec_match(db: str, p_str: str, g_str: str) -> int:
+def eval_exec_match(db: str, p_str: str, g_str: str, plug_value: bool, keep_distinct: bool, progress_bar_for_each_datapoint: bool) -> int:
     # post-process the prediction.
     # e.g. removing spaces between ">" and "="
     p_str, g_str = postprocess(p_str), postprocess(g_str)
+    if not keep_distinct:
+        p_str = remove_distinct(p_str)
+        g_str = remove_distinct(g_str)
 
     # we decide whether two denotations are equivalent based on "bag semantics"
     # https://courses.cs.washington.edu/courses/cse444/10sp/lectures/lecture16.pdf
@@ -195,12 +204,21 @@ def eval_exec_match(db: str, p_str: str, g_str: str) -> int:
     # if plug in value (i.e. we do not consider value prediction correctness)
     # enumerate all ways to plug in values in the gold query to the model predictions
     # otherwise, we only evaluate the predicted query with its own value prediction
+    if plug_value:
+        _, preds = get_all_preds_for_execution(g_str, p_str)
+        # we did not add this line in our EMNLP work
+        # this reduces "false negatives" when value is substituted
+        preds = chain([p_str], preds)
+
     for pred in preds:
 
         pred_passes = 1
         # compare the gold and predicted denotations on each database in the directory
         # wrap with progress bar if required
-        ranger = db_paths
+        if progress_bar_for_each_datapoint:
+            ranger = tqdm.tqdm(db_paths)
+        else:
+            ranger = db_paths
 
         for db_path in ranger:
             g_flag, g_denotation = asyncio.run(exec_on_db(db_path, g_str))
@@ -215,11 +233,7 @@ def eval_exec_match(db: str, p_str: str, g_str: str) -> int:
 
             # if denotations are not equivalent, the prediction must be wrong
             elif not result_eq(g_denotation, p_denotation, order_matters=order_matters):
-                # print(f"gold_sql:\n{g_str}\n\npred_sql:\n{pred}\n\n")
-                # print(f"gold_denotation:\n{g_denotation}\n\npred_denotation:\n{p_denotation}\n")
-                # input("Press Enter to continue...")
                 pred_passes = 0
-            
             if pred_passes == 0:
                 break
 

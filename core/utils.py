@@ -9,6 +9,29 @@ from core.const import subq_pattern
 from typing import Dict, List
 
 
+def is_valid_date(date_str):
+    if (not isinstance(date_str, str)):
+        return False
+    date_str = date_str.split()[0]
+    if len(date_str) != 10:
+        return False
+    pattern = r'^\d{4}-\d{2}-\d{2}$'
+    if re.match(pattern, date_str):
+        year, month, day = map(int, date_str.split('-'))
+        if year < 1 or month < 1 or month > 12 or day < 1 or day > 31:
+            return False
+        else:
+            return True
+    else:
+        return False
+
+
+def is_valid_date_column(col_value_lst):
+    for col_value in col_value_lst:
+        if not is_valid_date(col_value):
+            return False
+    return True
+
 
 def rename_file(file_path, new_name):
     """

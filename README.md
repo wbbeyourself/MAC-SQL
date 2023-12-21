@@ -8,6 +8,7 @@ In this paper, we propose a multi-agent collaborative Text-to-SQL framework MAC-
 
 
 # 🔥 Updates
+- [**2023-12-26**] We have updated the paper, with updates mainly focusing on the title, abstract, introduction, some details, and appendix. In addition, we give some bad case examples on `bad_cases` folder, check it out!
 - [**2023-12-19**] We released our first version [paper](https://arxiv.org/abs/2312.11242), [code](https://github.com/wbbeyourself/MAC-SQL). Check it out!
 
 
@@ -50,6 +51,14 @@ You should open code comments for different usage.
 
 - `run.sh` for Linux/Mac OS
 - `run.bat` for Windows OS
+
+For SQL execution demo, you can use `app_bird.py` or `app_spider.py` to get the execution result of your SQL query.
+
+```bash
+cd ./scripts
+python app_bird.py
+python app_spider.py
+```
 
 ## 📝Evaluation Dataset
 

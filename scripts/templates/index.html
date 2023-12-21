@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SQL Engine</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: flex-start;
+            width: 300px;
+        }
+
+        select {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 500px;
+            text-align: center; /* 将选项文字居中对齐 */
+        }
+
+        textarea, input[type="submit"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 500px;
+        }
+
+        textarea#sql {
+            width: 500px;
+            height: 100px;
+        }
+
+        textarea#result {
+            width: 500px;
+            height: 200px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+
+        .result-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .CodeMirror {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 500px;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var sqlTextArea = document.getElementById("sql");
+            CodeMirror.fromTextArea(sqlTextArea, {
+                mode: "text/x-sql",
+                theme: "default",
+                lineNumbers: true
+            });
+        });
+    </script>
+</head>
+<body>
+    <form method="POST" action="/">
+        <label for="database">选择数据库：</label>
+        <select id="database" name="database">
+            {% for db in databases %}
+            <option value="{{ db }}" {% if db == selected_database %}selected{% endif %}>{{ db }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <label for="sql">输入 SQL：</label>
+        <textarea id="sql" name="sql" rows="5" placeholder="请输入 SQL 语句" required>{{ sql }}</textarea>
+        <br><br>
+        <input type="submit" value="执行" name="submit">
+    </form>
+    <div class="result-container">
+        {% if result %}
+        <h3>执行结果：</h3>
+        <textarea id="result" rows="8" readonly>{{ result }}</textarea>
+        {% endif %}
+    </div>
+</body>
+</html>
