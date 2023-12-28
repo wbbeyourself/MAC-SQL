@@ -44,7 +44,8 @@ def api_func(prompt:str):
     global MODEL_NAME
     if MODEL_NAME is None:
         # MODEL_NAME = 'gpt-4-32k' # 0613版本
-        MODEL_NAME = 'gpt-4' # 0613版本
+        MODEL_NAME = 'gpt-4-1106-Preview' # 128k 版本
+        # MODEL_NAME = 'gpt-4' # 0613版本
         # MODEL_NAME = 'gpt-35-turbo-16k' # 0613版本
     print(f"\nUse OpenAI model: {MODEL_NAME}\n")
     response = openai.ChatCompletion.create(
