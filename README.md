@@ -81,10 +81,10 @@ Refer to our paper for the details.
 |  ├─agents.py       # define three agents class
 |  ├─api_config.py   # OpenAI API ENV config
 |  ├─chat_manager.py # manage the communication between agents
-|  ├─const.py  # prompt templates and CONST values
-|  ├─llm.py    # api call function and log print
-|  ├─utils.py  # utils function
-├─scripts      # sqlite execution flask demo
+|  ├─const.py        # prompt templates and CONST values
+|  ├─llm.py          # api call function and log print
+|  ├─utils.py        # utils function
+├─scripts            # sqlite execution flask demo
 |  ├─app_bird.py
 |  ├─app_spider.py
 |  ├─templates
