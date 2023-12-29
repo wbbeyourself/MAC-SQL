@@ -1,6 +1,6 @@
 ## 📖Introduction
 
-This is the official repository for the paper ["MAC-SQL: Multi-Agent Collaboration for text-to-SQL task"](https://arxiv.org/abs/2312.11242).
+This is the official repository for the paper ["MAC-SQL: A Multi-Agent Collaborative Framework for Text-to-SQL"](https://arxiv.org/abs/2312.11242).
 
 In this paper, we propose a multi-agent collaborative Text-to-SQL framework MAC-SQL, which comprises three agents: the **Selector**, the **Decomposer**, and the **Refiner**.
 
