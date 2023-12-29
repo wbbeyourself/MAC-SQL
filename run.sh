@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# default using gpt-4-32k
+# default using gpt-4-1106-preview (128k) in core.llm.py api_func
+
 
 # Generate SQL on foo dataset for env test
 # This will get ./outputs/foo/output_bird.json and ./outputs/foo/predict_test.json

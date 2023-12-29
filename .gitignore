@@ -10,6 +10,7 @@ core/magic.config.json
 outputs/
 test.py
 api.py
+ooo-api.py
 baseline/
 tmp/
 data/bird/
