@@ -71,6 +71,38 @@ VES: Valid Efficiency Score(%)
 Refer to our paper for the details.
 
 
+## 🌟 Project Structure
+
+```txt
+├─data # store datasets and databases
+|  ├─spider
+|  ├─bird
+├─core
+|  ├─agents.py       # define three agents class
+|  ├─api_config.py   # OpenAI API ENV config
+|  ├─chat_manager.py # manage the communication between agents
+|  ├─const.py  # prompt templates and CONST values
+|  ├─llm.py    # api call function and log print
+|  ├─utils.py  # utils function
+├─scripts      # sqlite execution flask demo
+|  ├─app_bird.py
+|  ├─app_spider.py
+|  ├─templates
+├─evaluation # evaluation scripts
+|  ├─evaluation_bird_ex.py
+|  ├─evaluation_bird_ves.py
+|  ├─evaluation_spider.py
+├─bad_cases
+|  ├─badcase_BIRD(dev)_examples.xlsx
+|  └badcase_Spider(dev)_examples.xlsx
+├─evaluation_bird_ex_ves.sh # bird evaluation script
+├─README.md
+├─requirements.txt
+├─run.py # main run script
+├─run.sh # generation and evaluation script
+```
+
+
 ## 💬Citation
 
 
