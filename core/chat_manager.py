@@ -20,7 +20,7 @@ from pprint import pprint
 
 
 class ChatManager(object):
-    def __init__(self, data_path: str, tables_json_path: str, log_path: str, model_name: str, dataset_name:str, lazy: bool=False):
+    def __init__(self, data_path: str, tables_json_path: str, log_path: str, model_name: str, dataset_name:str, lazy: bool=False, without_selector: bool=False):
         self.data_path = data_path  # root path to database dir, including all databases
         self.tables_json_path = tables_json_path # path to table description json file
         self.log_path = log_path  # path to record important printed content during running
@@ -28,7 +28,7 @@ class ChatManager(object):
         self.dataset_name = dataset_name
         self.ping_network()
         self.chat_group = [
-            Selector(data_path=self.data_path, tables_json_path=self.tables_json_path, model_name=self.model_name, dataset_name=dataset_name, lazy=lazy),
+            Selector(data_path=self.data_path, tables_json_path=self.tables_json_path, model_name=self.model_name, dataset_name=dataset_name, lazy=lazy, without_selector=without_selector),
             Decomposer(dataset_name=dataset_name),
             Refiner(data_path=self.data_path, dataset_name=dataset_name)
         ]

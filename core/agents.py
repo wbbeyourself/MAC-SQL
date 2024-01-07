@@ -46,7 +46,7 @@ class Selector(BaseAgent):
     name = SELECTOR_NAME
     description = "Get database description and if need, extract relative tables & columns"
 
-    def __init__(self, data_path: str, tables_json_path: str, model_name: str, dataset_name:str, lazy: bool = False, ):
+    def __init__(self, data_path: str, tables_json_path: str, model_name: str, dataset_name:str, lazy: bool = False, without_selector: bool = False):
         super().__init__()
         self.data_path = data_path.strip('/').strip('\\')
         self.tables_json_path = tables_json_path
@@ -58,6 +58,7 @@ class Selector(BaseAgent):
         if not lazy:
             self._load_all_db_info()
         self._message = {}
+        self.without_selector = without_selector
     
     def init_db2jsons(self):
         if not os.path.exists(self.tables_json_path):
@@ -414,7 +415,8 @@ class Selector(BaseAgent):
     
     def _get_db_desc_str(self,
                          db_id: str,
-                         extracted_schema: dict) -> List[str]:
+                         extracted_schema: dict,
+                         use_gold_schema: bool = False) -> List[str]:
         """
         Add foreign keys, and value descriptions of focused columns.
         :param db_id: name of sqlite database
@@ -449,6 +451,8 @@ class Selector(BaseAgent):
                 zip(desc_info.items(), value_info.items(), fk_info.items(), pk_info.items()):
             
             table_decision = extracted_schema.get(table_name, '')
+            if table_decision == '' and use_gold_schema:
+                continue
 
             # columns_desc = [(column_name, full_column_name, extra_column_desc): str]
             # columns_val = [(column_name, value_examples_str): str]
@@ -556,8 +560,13 @@ class Selector(BaseAgent):
                                           message.get('extracted_schema', {}), \
                                           message.get('query'), \
                                           message.get('evidence')
-        db_schema, db_fk, chosen_db_schem_dict = self._get_db_desc_str(db_id=db_id, extracted_schema=ext_sch)
+        use_gold_schema = False
+        if ext_sch:
+            use_gold_schema = True
+        db_schema, db_fk, chosen_db_schem_dict = self._get_db_desc_str(db_id=db_id, extracted_schema=ext_sch, use_gold_schema=use_gold_schema)
         need_prune = self._is_need_prune(db_id)
+        if self.without_selector:
+            need_prune = False
         if ext_sch == {} and need_prune:
             raw_extracted_schema_dict = self._prune(db_id=db_id, query=query, db_schema=db_schema, db_fk=db_fk, evidence=evidence)
             print(f"query: {message['query']}\n")

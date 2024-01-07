@@ -34,7 +34,7 @@ def init_spider_message(idx: int, item: dict) -> dict:
     return user_message
 
 
-def init_bird_message(idx: int, item: dict, db_path: str=None) -> dict:
+def init_bird_message(idx: int, item: dict, db_path: str=None, use_gold_schema: bool = False) -> dict:
     """
     Construct message for text-to-SQL task
     :param idx: start from 0
@@ -44,15 +44,26 @@ def init_bird_message(idx: int, item: dict, db_path: str=None) -> dict:
     db_id, query, evidence, gt, difficulty = item['db_id'], \
                                              item['question'], \
                                              item['evidence'], \
-                                             item['SQL'], \
+                                             item.get('SQL', ''), \
                                              item.get('difficulty', 'simple')
+    
+    gold_schema_path = './data/bird/dev_gold_schema.json'
+    gold_schema = {}
+    key = f"{db_id.strip()}\t{query.strip()}"
+    if use_gold_schema:
+        if os.path.exists(gold_schema_path):
+            all_gold_schema_dict = load_json_file(gold_schema_path)
+        if key in all_gold_schema_dict:
+            gold_schema = all_gold_schema_dict[key]
+        else:
+            raise ValueError(f"Can't find gold schema for {key}")
+    
     user_message = {
         "idx": idx,
         "db_id": db_id,
         "query": query,
         "evidence": evidence,
-        "extracted_schema": {},
-        # "extracted_schema": get_gold_columns(idx, f"{db_path}/{db_id}/{db_id}.sqlite"),  # todo:upper bound of pruner
+        "extracted_schema": gold_schema if gold_schema else {},
         "ground_truth": gt,
         "difficulty": difficulty,
         "send_to": SYSTEM_NAME
@@ -60,13 +71,14 @@ def init_bird_message(idx: int, item: dict, db_path: str=None) -> dict:
     return user_message
 
 
-def run_batch(dataset_name, input_file, output_file, db_path, tables_json_path, start_pos=0, log_file=None, dataset_mode='dev'):
+def run_batch(dataset_name, input_file, output_file, db_path, tables_json_path, start_pos=0, log_file=None, dataset_mode='dev', use_gold_schema=False, without_selector=False):
     chat_manager = ChatManager(data_path=db_path,
                                tables_json_path=tables_json_path,
                                log_path=log_file,
                                dataset_name=dataset_name,
-                               model_name='gpt-4-32k',
-                               lazy=True)
+                               model_name='gpt-4',
+                               lazy=True,
+                               without_selector=without_selector)
     # load dataset
     batch = load_json_file(input_file)
     # resume from last checkpoint
@@ -112,12 +124,13 @@ def run_batch(dataset_name, input_file, output_file, db_path, tables_json_path, 
         total_num = len(batch)
         for cur_idx, item in tqdm(enumerate(batch)):
             idx = item['question_id']
+            db_id = item['db_id']
             print(f"\n\nprocessing: {cur_idx}/{total_num}\n\n", flush=True)
             if idx not in unfinished_ids: continue
             if dataset_name == "spider":
                 user_message = init_spider_message(idx, item)  # imitate user send a question to system
             elif dataset_name == "bird":
-                user_message = init_bird_message(idx, item, db_path=db_path)  # imitate user send a question to system
+                user_message = init_bird_message(idx, item, db_path=db_path, use_gold_schema=use_gold_schema)  # imitate user send a question to system
             try:
                 chat_manager.start(user_message)
                 try:
@@ -187,7 +200,12 @@ if __name__ == "__main__":
     parser.add_argument('--output_file', type=str, required=True, help='path to predicted output')
     parser.add_argument('--log_file', type=str, default='', help='path to log file if needed')
     parser.add_argument('--start_pos', type=int, default=0, help='start position of a batch')
+    parser.add_argument('--use_gold_schema', action='store_true', default=False)
+    parser.add_argument('--without_selector', action='store_true', default=False)
     args = parser.parse_args()
+    # 打印args中的键值对
+    for key, value in vars(args).items():
+        print(f"{key}: {value}")
 
     check_all_paths(args)
 
@@ -195,7 +213,6 @@ if __name__ == "__main__":
     args_json_str = json.dumps(vars(args), indent=2, ensure_ascii=False)
     print(f"args:\n{args_json_str}")
     time.sleep(3)
-
 
     run_batch(
         dataset_name=args.dataset_name,
@@ -206,4 +223,6 @@ if __name__ == "__main__":
         tables_json_path=args.tables_json_path,
         log_file=args.log_file,
         start_pos=args.start_pos,
+        use_gold_schema=args.use_gold_schema,
+        without_selector=args.without_selector
     )
