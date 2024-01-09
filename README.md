@@ -28,7 +28,7 @@ Note: we use `openai==0.28.1`, which use `openai.ChatCompletion.create` to call 
 
 2. Edit openai config at **core/api_config.py**, and set related environment variables of Azure OpenAI API.
 
-Currently, we use `gpt-4-1106-Preview` (128k version) by default, which is 2.5 times less expensive than the `gpt-4 (8k)` on average.
+Currently, we use `gpt-4-1106-preview` (128k version) by default, which is 2.5 times less expensive than the `gpt-4 (8k)` on average.
 
 ```bash
 export OPENAI_API_BASE="YOUR_OPENAI_API_BASE"

@@ -524,7 +524,10 @@ class Selector(BaseAgent):
         
         return schema_desc_str, fk_desc_str, chosen_db_schem_dict
 
-    def _is_need_prune(self, db_id: str):
+    def _is_need_prune(self, db_id: str, db_schema: str):
+        # encoder = tiktoken.get_encoding("cl100k_base")
+        # tokens = encoder.encode(db_schema)
+        # return len(tokens) >= 25000
         db_dict = self.db2dbjsons[db_id]
         avg_column_count = db_dict['avg_column_count']
         total_column_count = db_dict['total_column_count']
@@ -564,7 +567,7 @@ class Selector(BaseAgent):
         if ext_sch:
             use_gold_schema = True
         db_schema, db_fk, chosen_db_schem_dict = self._get_db_desc_str(db_id=db_id, extracted_schema=ext_sch, use_gold_schema=use_gold_schema)
-        need_prune = self._is_need_prune(db_id)
+        need_prune = self._is_need_prune(db_id, db_schema)
         if self.without_selector:
             need_prune = False
         if ext_sch == {} and need_prune:

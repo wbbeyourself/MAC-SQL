@@ -1,11 +1,6 @@
 import sys
-# sys.path.append(".")
-# sys.path.append("..")
-import time
 import json
 from core.api_config import *
-
-MODEL_NAME = None
 
 MAX_TRY = 5
 
@@ -33,20 +28,8 @@ def init_log_path(my_log_path):
     api_trace_json_path = os.path.join(dir_name, 'api_trace.json')
 
 
-# def init_model_name(model_name: str):
-#     global CHOOSE
-#     global MODEL_NAME
-#     MODEL_NAME = model_name
-#     CHOOSE = True
-
-
 def api_func(prompt:str):
     global MODEL_NAME
-    if MODEL_NAME is None:
-        # MODEL_NAME = 'gpt-4-32k' # 0613版本
-        MODEL_NAME = 'gpt-4-1106-preview' # 128k 版本
-        # MODEL_NAME = 'gpt-4' # 0613版本
-        # MODEL_NAME = 'gpt-35-turbo-16k' # 0613版本
     print(f"\nUse OpenAI model: {MODEL_NAME}\n")
     response = openai.ChatCompletion.create(
         engine=MODEL_NAME,
