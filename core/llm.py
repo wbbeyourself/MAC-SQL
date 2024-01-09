@@ -1,5 +1,6 @@
 import sys
 import json
+import time
 from core.api_config import *
 
 MAX_TRY = 5
@@ -31,6 +32,8 @@ def init_log_path(my_log_path):
 def api_func(prompt:str):
     global MODEL_NAME
     print(f"\nUse OpenAI model: {MODEL_NAME}\n")
+    if MODEL_NAME.startswith('CodeLlama'):
+        openai.api_base = 'http://0.0.0.0:8000/v1'
     response = openai.ChatCompletion.create(
         engine=MODEL_NAME,
         messages=[{"role": "user", "content": prompt}],
