@@ -255,11 +255,7 @@ Decompose the question into sub questions, considering 【Constraints】, and ge
 
 
 decompose_template_spider = """
-Given a 【Database schema】 description, a knowledge 【Evidence】 and the 【Question】, you need to use valid SQLite and understand the database and knowledge, and then decompose the question into subquestions for text-to-SQL generation.
-When generating SQL, we should always consider constraints:
-【Constraints】
-- In `SELECT <column>`, just select needed columns in the 【Question】 without any unnecessary column or value
-- If [Value examples] of <column> has 'None' or None, use `JOIN <table>` or `WHERE <column> is NOT NULL` is better
+Given a 【Database schema】 description, and the 【Question】, you need to use valid SQLite and understand the database, and then generate the corresponding SQL.
 
 ==========
 
@@ -287,18 +283,10 @@ When generating SQL, we should always consider constraints:
 concert.`Stadium_ID` = stadium.`Stadium_ID`
 【Question】
 Show the stadium name and the number of concerts in each stadium.
-【Evidence】
-NULL
 
-Decompose the question into sub questions, considering 【Constraints】, and generate the SQL after thinking step by step:
-Sub question 1: Show the stadium name and the number of concerts in each stadium.
 SQL
 ```sql
-SELECT T1.`Name`, COUNT(*) AS num_concerts
-  FROM stadium AS T1
-  JOIN concert AS T2
-  ON T1.`Stadium_ID` = T2.`Stadium_ID`
-  GROUP BY T1.`Stadium_ID`
+SELECT T1.`Name`, COUNT(*) FROM stadium AS T1 JOIN concert AS T2 ON T1.`Stadium_ID` = T2.`Stadium_ID` GROUP BY T1.`Stadium_ID`
 ```
 
 Question Solved.
@@ -333,28 +321,11 @@ singer_in_concert.`Singer_ID` = singer.`Singer_ID`
 singer_in_concert.`concert_ID` = concert.`concert_ID`
 【Question】
 Show the name and the release year of the song by the youngest singer.
-【Evidence】
-NULL
 
-Decompose the question into sub questions, considering 【Constraints】, and generate the SQL after thinking step by step:
-Sub question 1: What is the id of the youngest singer?
+
 SQL
 ```sql
-SELECT `Singer_ID`
-  FROM singer
-  WHERE `Age` = (SELECT MIN(`Age`) FROM singer)
-```
-
-Sub question 2: Show the song name and the song release year by the youngest singer.
-SQL
-```sql
-SELECT `Song_Name`, `Song_release_year`
-  FROM singer
-  WHERE `Singer_ID` = (
-    SELECT `Singer_ID`
-      FROM singer
-      WHERE `Age` = (SELECT MIN(`Age`) FROM singer)
-  )
+SELECT `Song_Name`, `Song_release_year` FROM singer WHERE Age = (SELECT MIN(Age) FROM singer)
 ```
 
 Question Solved.
@@ -367,10 +338,9 @@ Question Solved.
 {fk_str}
 【Question】
 {query}
-【Evidence】
-{evidence}
 
-Decompose the question into sub questions, considering 【Constraints】, and generate the SQL after thinking step by step:
+SQL
+
 """
 
 
