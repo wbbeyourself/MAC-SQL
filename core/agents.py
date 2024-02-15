@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from core.utils import parse_json, parse_sql, parse_qa_pairs, parse_single_sql, add_prefix, get_files, load_json_file, extract_world_info, is_email, is_valid_date_column
+from core.utils import parse_json, parse_qa_pairs, parse_sql_from_string, add_prefix, load_json_file, extract_world_info, is_email, is_valid_date_column
 
 
 LLM_API_FUC = None
@@ -86,7 +86,7 @@ class Selector(BaseAgent):
             # print(f"max_column_count: {item['max_column_count']}")
             # print(f"total_column_count: {item['total_column_count']}")
             # print(f"avg_column_count: {item['avg_column_count']}")
-            time.sleep(0.2)
+            # time.sleep(0.2)
             self.db2dbjsons[db_id] = item
     
     
@@ -619,22 +619,34 @@ class Decomposer(BaseAgent):
         
         if self.dataset_name == 'bird':
             decompose_template = decompose_template_bird
+            prompt = decompose_template.format(query=query, desc_str=schema_info, fk_str=fk_info, evidence=evidence)
         else:
             # default use spider template
             decompose_template = decompose_template_spider
+            prompt = decompose_template.format(query=query, desc_str=schema_info, fk_str=fk_info)
         
-        prompt = decompose_template.format(query=query, evidence=evidence, desc_str=schema_info, fk_str=fk_info)
         
         ## one shot decompose(first) # fixme
         # prompt = oneshot_template_2.format(query=query, evidence=evidence, desc_str=schema_info, fk_str=fk_info)
         word_info = extract_world_info(self._message)
-        reply = LLM_API_FUC(prompt, **word_info)
-        qa_pairs = parse_qa_pairs(reply)
+        reply = LLM_API_FUC(prompt, **word_info).strip()
+        
+        # reply parse different for Spider and BIRD
+        res = ''
+        qa_pairs = []
+        
+        if self.dataset_name == 'bird':
+            qa_pairs = reply.split('\n\n')
+            res = parse_sql_from_string(qa_pairs[-1])
+        elif self.dataset_name == 'spider':
+            res = parse_sql_from_string(reply)
+            qa_pairs = [res]
+        
         ## Without decompose
         # prompt = zeroshot_template.format(query=query, evidence=evidence, desc_str=schema_info, fk_str=fk_info)
         # reply = LLM_API_FUC(prompt)
         # qa_pairs = []
-        res = qa_pairs[-1][1] if len(qa_pairs) > 0 else parse_single_sql(reply)
+        
         message['final_sql'] = res
         message['qa_pairs'] = qa_pairs
         message['fixed'] = False
