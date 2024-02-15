@@ -86,7 +86,7 @@ class Selector(BaseAgent):
             # print(f"max_column_count: {item['max_column_count']}")
             # print(f"total_column_count: {item['total_column_count']}")
             # print(f"avg_column_count: {item['avg_column_count']}")
-            time.sleep(0.2)
+            # time.sleep(0.2)
             self.db2dbjsons[db_id] = item
     
     
@@ -619,11 +619,12 @@ class Decomposer(BaseAgent):
         
         if self.dataset_name == 'bird':
             decompose_template = decompose_template_bird
+            prompt = decompose_template.format(query=query, desc_str=schema_info, fk_str=fk_info, evidence=evidence)
         else:
             # default use spider template
             decompose_template = decompose_template_spider
+            prompt = decompose_template.format(query=query, desc_str=schema_info, fk_str=fk_info)
         
-        prompt = decompose_template.format(query=query, evidence=evidence, desc_str=schema_info, fk_str=fk_info)
         
         ## one shot decompose(first) # fixme
         # prompt = oneshot_template_2.format(query=query, evidence=evidence, desc_str=schema_info, fk_str=fk_info)

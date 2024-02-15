@@ -269,6 +269,15 @@ def load_jsonl_file(path):
         return data
 
 
+def append_file(path, string_lst):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'a+', encoding='utf-8') as f:
+        for string in string_lst:
+            if string[-1] != '\n':
+                string += '\n'
+            f.write(string)
+
+
 def save_file(path, string_lst):
     """
     保存文件

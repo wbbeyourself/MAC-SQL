@@ -259,8 +259,7 @@ Given a 【Database schema】 description, and the 【Question】, you need to u
 
 ==========
 
-【DB_ID】 concert_singer
-【Schema】
+【Database schema】
 # Table: stadium
 [
   (Stadium_ID, stadium id. Value examples: [1, 2, 3, 4, 5, 6].),
