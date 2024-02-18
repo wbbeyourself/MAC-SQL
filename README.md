@@ -110,10 +110,10 @@ Refer to our paper for the details.
 If you find our work is helpful, please cite as:
 
 ```text
-@misc{wang2023macsql,
-      title={MAC-SQL: Multi-Agent Collaboration for Text-to-SQL}, 
-      author={Bing Wang and Changyu Ren and Jian Yang and Xinnian Liang and Jiaqi Bai and Qian-Wen Zhang and Zhao Yan and Zhoujun Li},
-      year={2023},
+@misc{wang2024macsql,
+      title={MAC-SQL: A Multi-Agent Collaborative Framework for Text-to-SQL}, 
+      author={Bing Wang and Changyu Ren and Jian Yang and Xinnian Liang and Jiaqi Bai and Linzheng Chai and Zhao Yan and Qian-Wen Zhang and Di Yin and Xing Sun and Zhoujun Li},
+      year={2024},
       eprint={2312.11242},
       archivePrefix={arXiv},
       primaryClass={cs.CL}
