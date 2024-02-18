@@ -8,6 +8,7 @@ In this paper, we propose a multi-agent collaborative Text-to-SQL framework MAC-
 
 
 # 🔥 Updates
+- [**2024-02-18**] We have updated the paper, with updates mainly focusing on experiments and framework details, check it out! [link](https://arxiv.org/abs/2312.11242).
 - [**2023-12-26**] We have updated the paper, with updates mainly focusing on the title, abstract, introduction, some details, and appendix. In addition, we give some bad case examples on `bad_cases` folder, check it out!
 - [**2023-12-19**] We released our first version [paper](https://arxiv.org/abs/2312.11242), [code](https://github.com/wbbeyourself/MAC-SQL). Check it out!
 
