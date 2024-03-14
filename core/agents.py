@@ -723,7 +723,7 @@ class Refiner(BaseAgent):
 
         word_info = extract_world_info(self._message)
         reply = LLM_API_FUC(prompt, **word_info)
-        res = parse_single_sql(reply)
+        res = parse_sql_from_string(reply)
         return res
 
     def talk(self, message: dict):
