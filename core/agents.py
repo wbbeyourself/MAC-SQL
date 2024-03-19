@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from core.utils import parse_json, parse_qa_pairs, parse_sql_from_string, add_prefix, load_json_file, extract_world_info, is_email, is_valid_date_column
+from core.utils import parse_json, parse_sql_from_string, add_prefix, load_json_file, extract_world_info, is_email, is_valid_date_column
 
 
 LLM_API_FUC = None
@@ -571,7 +571,13 @@ class Selector(BaseAgent):
         if self.without_selector:
             need_prune = False
         if ext_sch == {} and need_prune:
-            raw_extracted_schema_dict = self._prune(db_id=db_id, query=query, db_schema=db_schema, db_fk=db_fk, evidence=evidence)
+            
+            try:
+                raw_extracted_schema_dict = self._prune(db_id=db_id, query=query, db_schema=db_schema, db_fk=db_fk, evidence=evidence)
+            except Exception as e:
+                print(e)
+                raw_extracted_schema_dict = {}
+            
             print(f"query: {message['query']}\n")
             db_schema_str, db_fk, chosen_db_schem_dict = self._get_db_desc_str(db_id=db_id, extracted_schema=raw_extracted_schema_dict)
 
@@ -631,16 +637,21 @@ class Decomposer(BaseAgent):
         word_info = extract_world_info(self._message)
         reply = LLM_API_FUC(prompt, **word_info).strip()
         
-        # reply parse different for Spider and BIRD
-        res = ''
-        qa_pairs = []
         
         if self.dataset_name == 'bird':
-            qa_pairs = reply.split('\n\n')
-            res = parse_sql_from_string(qa_pairs[-1])
-        elif self.dataset_name == 'spider':
+            if 'Question Solved' in reply:
+                reply = reply.split('Question Solved')[0]
+        
+        # reply parse different for Spider and BIRD
+        res = ''
+        qa_pairs = reply
+        
+        try:
             res = parse_sql_from_string(reply)
-            qa_pairs = [res]
+        except Exception as e:
+            res = f'error: {str(e)}'
+            print(res)
+            time.sleep(1)
         
         ## Without decompose
         # prompt = zeroshot_template.format(query=query, evidence=evidence, desc_str=schema_info, fk_str=fk_info)
@@ -691,8 +702,13 @@ class Refiner(BaseAgent):
                 "exception_class": str(type(e).__name__)
             }
 
-    @staticmethod
-    def _is_need_refine(exec_result: dict):
+    def _is_need_refine(self, exec_result: dict):
+        # spider exist dirty values, even gold sql execution result is None
+        if self.dataset_name == 'spider':
+            if 'data' not in exec_result:
+                return True
+            return False
+        
         data = exec_result.get('data', None)
         if data is not None:
             if len(data) == 0:
@@ -745,7 +761,15 @@ class Refiner(BaseAgent):
                                                             message.get('evidence'), \
                                                             message.get('desc_str'), \
                                                             message.get('fk_str')
+        # do not fix sql containing "error" string
+        if 'error' in old_sql:
+            message['try_times'] = message.get('try_times', 0) + 1
+            message['pred'] = old_sql
+            message['send_to'] = SYSTEM_NAME
+            return
+        
         error_info = self._execute_sql(old_sql, db_id)
+        
         if not self._is_need_refine(error_info):  # correct in one pass or refine success
             message['try_times'] = message.get('try_times', 0) + 1
             message['pred'] = old_sql
@@ -756,6 +780,7 @@ class Refiner(BaseAgent):
             message['pred'] = new_sql
             message['fixed'] = True
             message['send_to'] = REFINER_NAME
+        return
 
 
 if __name__ == "__main__":
