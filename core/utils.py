@@ -353,6 +353,24 @@ def parse_sql_from_string(input_string):
         return "No SQL found in the input string"
 
 
+def parse_single_sql(res: str) -> str:  # if do not need decompose, just one code block is OK!
+    """Return SQL in markdown block"""
+    lines = res.split('\n')
+    iter, start_idx, end_idx = -1, -1, -1
+    for idx in range(iter + 1, len(lines)):
+        if '```' in lines[idx]:
+            start_idx = idx
+            break
+    if start_idx == -1: return ""
+    for idx in range(start_idx + 1, len(lines)):
+        if '```' in lines[idx]:
+            end_idx = idx
+            break
+    if end_idx == -1: return f"error: \n{res}"
+
+    return " ".join(lines[start_idx + 1: end_idx])
+
+
 def parse_qa_pairs(res: str, end_pos=2333) -> list:
     lines = res.split('\n')
     qa_pairs = []
