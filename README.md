@@ -72,6 +72,17 @@ VES: Valid Efficiency Score(%)
 Refer to our paper for the details.
 
 
+## 🫡Run SQL-Llama
+
+Download the [SQL-Llama](https://huggingface.co/IceKingBing/SQL-Llama-v0.5) and follow the [SQL-Llama-deployment.md](SQL-Llama-deployment.md) to deploy.
+
+Uncomment the `MODEL_NAME = 'CodeLlama-7b-hf'` in `core/api_config.py` to set the global model and comment other `MODEL_NAME = xxx` lines.
+
+Uncomment the `export OPENAI_API_BASE='http://0.0.0.0:8000/v1'` in `run.py` to set the local model api base.
+
+Then, run `run.sh` to start your local inference.
+
+
 ## 🌟 Project Structure
 
 ```txt

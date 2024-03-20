@@ -61,7 +61,8 @@ def execute_model(predicted_sql, ground_truth, db_place, idx, iterate_num, meta_
         # you can personalize the total timeout number
         # larger timeout leads to more stable ves
         # while it needs more your patience....
-        print(idx, file=sys.stdout, flush=True)
+        if idx % 500 == 0:
+            print(idx, file=sys.stdout, flush=True)
         time_ratio = func_timeout(meta_time_out * iterate_num, iterated_execute_sql,
                                   args=(predicted_sql, ground_truth, db_place, iterate_num))
         # print([idx, math.sqrt(time_ratio)])
