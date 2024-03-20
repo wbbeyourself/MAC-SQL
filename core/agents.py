@@ -637,12 +637,6 @@ class Decomposer(BaseAgent):
         word_info = extract_world_info(self._message)
         reply = LLM_API_FUC(prompt, **word_info).strip()
         
-        
-        if self.dataset_name == 'bird':
-            if 'Question Solved' in reply:
-                reply = reply.split('Question Solved')[0]
-        
-        # reply parse different for Spider and BIRD
         res = ''
         qa_pairs = reply
         

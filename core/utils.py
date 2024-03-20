@@ -343,14 +343,17 @@ def parse_sql(res: str) -> str:
     return res.strip()
 
 
-
 def parse_sql_from_string(input_string):
     sql_pattern = r'```sql(.*?)```'
-    match = re.search(sql_pattern, input_string, re.DOTALL)
-    if match:
-        return match.group(1).strip()
+    all_sqls = []
+    # 将所有匹配到的都打印出来
+    for match in re.finditer(sql_pattern, input_string, re.DOTALL):
+        all_sqls.append(match.group(1).strip())
+    
+    if all_sqls:
+        return all_sqls[-1]
     else:
-        return "No SQL found in the input string"
+        return "error: No SQL found in the input string"
 
 
 def parse_single_sql(res: str) -> str:  # if do not need decompose, just one code block is OK!
