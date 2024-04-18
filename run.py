@@ -122,7 +122,7 @@ def run_batch(dataset_name, input_file, output_file, db_path, tables_json_path, 
     # generate SQL one by one, and save result one by one
     with open(output_file, 'a+', encoding='utf-8') as fp:
         total_num = len(batch)
-        for cur_idx, item in tqdm(enumerate(batch)):
+        for cur_idx, item in tqdm(enumerate(batch), total=total_num):
             idx = item['question_id']
             db_id = item['db_id']
             print(f"\n\nprocessing: {cur_idx}/{total_num}\n\n", flush=True)

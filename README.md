@@ -61,6 +61,8 @@ python app_bird.py
 python app_spider.py
 ```
 
+If occur error `/bin/bash^M: bad interpreter` in Linux, use `sed -i -e 's/\r$//' run.sh` to solve it.
+
 ## 📝Evaluation Dataset
 
 We evaluate our method on both BIRD dataset and Spider dataset.
@@ -78,7 +80,7 @@ Download the [SQL-Llama](https://huggingface.co/IceKingBing/SQL-Llama-v0.5) and 
 
 Uncomment the `MODEL_NAME = 'CodeLlama-7b-hf'` in `core/api_config.py` to set the global model and comment other `MODEL_NAME = xxx` lines.
 
-Uncomment the `export OPENAI_API_BASE='http://0.0.0.0:8000/v1'` in `run.py` to set the local model api base.
+Uncomment the `export OPENAI_API_BASE='http://0.0.0.0:8000/v1'` in `run.sh` to set the local model api base.
 
 Then, run `run.sh` to start your local inference.
 
