@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from core.utils import parse_json, parse_sql_from_string, add_prefix, load_json_file, extract_world_info, is_email, is_valid_date_column
-from func_timeout import func_set_timeout
+from func_timeout import func_set_timeout, FunctionTimedOut
 
 LLM_API_FUC = None
 # try import core.api, if error then import core.llm
@@ -768,8 +768,12 @@ class Refiner(BaseAgent):
             error_info = self._execute_sql(old_sql, db_id)
         except Exception as e:
             is_timeout = True
+        except FunctionTimedOut as fto:
+            is_timeout = True
         
-        if not self._is_need_refine(error_info) or is_timeout:  # correct in one pass or refine success or timeout
+        is_need = self._is_need_refine(error_info)
+        # is_need = False
+        if not is_need or is_timeout:  # correct in one pass or refine success or timeout
             message['try_times'] = message.get('try_times', 0) + 1
             message['pred'] = old_sql
             message['send_to'] = SYSTEM_NAME

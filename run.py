@@ -49,6 +49,7 @@ def init_bird_message(idx: int, item: dict, db_path: str=None, use_gold_schema: 
     
     gold_schema_path = './data/bird/dev_gold_schema.json'
     gold_schema = {}
+    all_gold_schema_dict = {}
     key = f"{db_id.strip()}\t{query.strip()}"
     if use_gold_schema:
         if os.path.exists(gold_schema_path):
