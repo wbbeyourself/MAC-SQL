@@ -32,6 +32,7 @@ export OPENAI_API_KEY="YOUR_OPENAI_API_KEY"
 
 In order to prepare the data more quickly, I have packaged the files including the databases of the BIRD dataset and the Spider dataset into `data.zip` and uploaded them. 
 All files were downloaded on December 19, 2023, ensuring they are the latest version at that moment. 
+
 The download links are available on Baidu Disk and Google Drive.
 
 After downloading the `data.zip` file, you should delete the existing data folder in the project directory and replace it with the unzipped data folder from `data.zip`.
@@ -53,6 +54,8 @@ python app_bird.py
 python app_spider.py
 ```
 
+If occur error `/bin/bash^M: bad interpreter` in Linux, use `sed -i -e 's/\r$//' run.sh` to solve it.
+
 ## 📝Evaluation Dataset
 
 We evaluate our method on both BIRD dataset and Spider dataset.
@@ -62,6 +65,17 @@ EX: Execution Accuracy(%)
 VES: Valid Efficiency Score(%)
 
 Refer to our paper for the details.
+
+
+## 🫡Run SQL-Llama
+
+Download the [SQL-Llama](https://huggingface.co/IceKingBing)(current v0.5 version) and follow the [SQL-Llama-deployment.md](SQL-Llama-deployment.md) to deploy.
+
+Uncomment the `MODEL_NAME = 'CodeLlama-7b-hf'` in `core/api_config.py` to set the global model and comment other `MODEL_NAME = xxx` lines.
+
+Uncomment the `export OPENAI_API_BASE='http://0.0.0.0:8000/v1'` in `run.sh` to set the local model api base.
+
+Then, run `run.sh` to start your local inference.
 
 
 ## 🌟 Project Structure
@@ -94,3 +108,4 @@ Refer to our paper for the details.
 ├─run.py # main run script
 ├─run.sh # generation and evaluation script
 ```
+

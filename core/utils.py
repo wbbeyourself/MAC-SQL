@@ -343,14 +343,35 @@ def parse_sql(res: str) -> str:
     return res.strip()
 
 
-
 def parse_sql_from_string(input_string):
     sql_pattern = r'```sql(.*?)```'
-    match = re.search(sql_pattern, input_string, re.DOTALL)
-    if match:
-        return match.group(1).strip()
+    all_sqls = []
+    # 将所有匹配到的都打印出来
+    for match in re.finditer(sql_pattern, input_string, re.DOTALL):
+        all_sqls.append(match.group(1).strip())
+    
+    if all_sqls:
+        return all_sqls[-1]
     else:
-        return "No SQL found in the input string"
+        return "error: No SQL found in the input string"
+
+
+def parse_single_sql(res: str) -> str:  # if do not need decompose, just one code block is OK!
+    """Return SQL in markdown block"""
+    lines = res.split('\n')
+    iter, start_idx, end_idx = -1, -1, -1
+    for idx in range(iter + 1, len(lines)):
+        if '```' in lines[idx]:
+            start_idx = idx
+            break
+    if start_idx == -1: return ""
+    for idx in range(start_idx + 1, len(lines)):
+        if '```' in lines[idx]:
+            end_idx = idx
+            break
+    if end_idx == -1: return f"error: \n{res}"
+
+    return " ".join(lines[start_idx + 1: end_idx])
 
 
 def parse_qa_pairs(res: str, end_pos=2333) -> list:

@@ -32,13 +32,20 @@ def init_log_path(my_log_path):
 def api_func(prompt:str):
     global MODEL_NAME
     print(f"\nUse OpenAI model: {MODEL_NAME}\n")
-    if MODEL_NAME.startswith('CodeLlama'):
-        openai.api_base = 'http://0.0.0.0:8000/v1'
-    response = openai.ChatCompletion.create(
-        engine=MODEL_NAME,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.1
-    )
+    if 'Llama' in MODEL_NAME:
+        openai.api_version = None
+        openai.api_type = "open_ai"
+        openai.api_key = "EMPTY"
+        response = openai.ChatCompletion.create(
+            model=MODEL_NAME,
+            messages=[{"role": "user", "content": prompt}]
+        )
+    else:
+        response = openai.ChatCompletion.create(
+            engine=MODEL_NAME,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1
+        )
     text = response['choices'][0]['message']['content'].strip()
     prompt_token = response['usage']['prompt_tokens']
     response_token = response['usage']['completion_tokens']
@@ -74,6 +81,7 @@ def safe_call_llm(input_prompt, **kwargs) -> str:
                     sys_response, prompt_token, response_token = api_func(input_prompt)
                     print(sys_response, file=log_fp)
                     print(f'\n prompt_token,response_token: {prompt_token} {response_token}\n', file=log_fp)
+                    print(f'\n prompt_token,response_token: {prompt_token} {response_token}\n')
 
                     if len(world_dict) > 0:
                         world_dict = {}

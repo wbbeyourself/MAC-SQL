@@ -210,8 +210,13 @@ def eval_exec_match(db: str, p_str: str, g_str: str, plug_value: bool, keep_dist
         # this reduces "false negatives" when value is substituted
         preds = chain([p_str], preds)
 
+    max_try = 50
+    count = 0
     for pred in preds:
-
+        count += 1
+        if count > max_try:
+            break
+        
         pred_passes = 1
         # compare the gold and predicted denotations on each database in the directory
         # wrap with progress bar if required

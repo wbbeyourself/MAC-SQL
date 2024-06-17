@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from core.utils import parse_json, parse_qa_pairs, parse_sql_from_string, add_prefix, load_json_file, extract_world_info, is_email, is_valid_date_column
-
+from core.utils import parse_json, parse_sql_from_string, add_prefix, load_json_file, extract_world_info, is_email, is_valid_date_column
+from func_timeout import func_set_timeout, FunctionTimedOut
 
 LLM_API_FUC = None
 # try import core.api, if error then import core.llm
@@ -571,7 +571,13 @@ class Selector(BaseAgent):
         if self.without_selector:
             need_prune = False
         if ext_sch == {} and need_prune:
-            raw_extracted_schema_dict = self._prune(db_id=db_id, query=query, db_schema=db_schema, db_fk=db_fk, evidence=evidence)
+            
+            try:
+                raw_extracted_schema_dict = self._prune(db_id=db_id, query=query, db_schema=db_schema, db_fk=db_fk, evidence=evidence)
+            except Exception as e:
+                print(e)
+                raw_extracted_schema_dict = {}
+            
             print(f"query: {message['query']}\n")
             db_schema_str, db_fk, chosen_db_schem_dict = self._get_db_desc_str(db_id=db_id, extracted_schema=raw_extracted_schema_dict)
 
@@ -631,16 +637,15 @@ class Decomposer(BaseAgent):
         word_info = extract_world_info(self._message)
         reply = LLM_API_FUC(prompt, **word_info).strip()
         
-        # reply parse different for Spider and BIRD
         res = ''
-        qa_pairs = []
+        qa_pairs = reply
         
-        if self.dataset_name == 'bird':
-            qa_pairs = reply.split('\n\n')
-            res = parse_sql_from_string(qa_pairs[-1])
-        elif self.dataset_name == 'spider':
+        try:
             res = parse_sql_from_string(reply)
-            qa_pairs = [res]
+        except Exception as e:
+            res = f'error: {str(e)}'
+            print(res)
+            time.sleep(1)
         
         ## Without decompose
         # prompt = zeroshot_template.format(query=query, evidence=evidence, desc_str=schema_info, fk_str=fk_info)
@@ -663,6 +668,7 @@ class Refiner(BaseAgent):
         self.dataset_name = dataset_name
         self._message = {}
 
+    @func_set_timeout(120)
     def _execute_sql(self, sql: str, db_id: str) -> dict:
         # Get database connection
         db_path = f"{self.data_path}/{db_id}/{db_id}.sqlite"
@@ -691,8 +697,13 @@ class Refiner(BaseAgent):
                 "exception_class": str(type(e).__name__)
             }
 
-    @staticmethod
-    def _is_need_refine(exec_result: dict):
+    def _is_need_refine(self, exec_result: dict):
+        # spider exist dirty values, even gold sql execution result is None
+        if self.dataset_name == 'spider':
+            if 'data' not in exec_result:
+                return True
+            return False
+        
         data = exec_result.get('data', None)
         if data is not None:
             if len(data) == 0:
@@ -723,7 +734,7 @@ class Refiner(BaseAgent):
 
         word_info = extract_world_info(self._message)
         reply = LLM_API_FUC(prompt, **word_info)
-        res = parse_single_sql(reply)
+        res = parse_sql_from_string(reply)
         return res
 
     def talk(self, message: dict):
@@ -745,8 +756,24 @@ class Refiner(BaseAgent):
                                                             message.get('evidence'), \
                                                             message.get('desc_str'), \
                                                             message.get('fk_str')
-        error_info = self._execute_sql(old_sql, db_id)
-        if not self._is_need_refine(error_info):  # correct in one pass or refine success
+        # do not fix sql containing "error" string
+        if 'error' in old_sql:
+            message['try_times'] = message.get('try_times', 0) + 1
+            message['pred'] = old_sql
+            message['send_to'] = SYSTEM_NAME
+            return
+        
+        is_timeout = False
+        try:
+            error_info = self._execute_sql(old_sql, db_id)
+        except Exception as e:
+            is_timeout = True
+        except FunctionTimedOut as fto:
+            is_timeout = True
+        
+        is_need = self._is_need_refine(error_info)
+        # is_need = False
+        if not is_need or is_timeout:  # correct in one pass or refine success or timeout
             message['try_times'] = message.get('try_times', 0) + 1
             message['pred'] = old_sql
             message['send_to'] = SYSTEM_NAME
@@ -756,6 +783,7 @@ class Refiner(BaseAgent):
             message['pred'] = new_sql
             message['fixed'] = True
             message['send_to'] = REFINER_NAME
+        return
 
 
 if __name__ == "__main__":
