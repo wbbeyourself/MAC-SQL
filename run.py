@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from utils import *
+from tools import *
 from core.chat_manager import ChatManager
 from core.const import SYSTEM_NAME
 from tqdm import tqdm

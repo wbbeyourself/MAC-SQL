@@ -2,9 +2,11 @@ openai==0.28.1
 # transformers==4.33.0
 func_timeout
 sqlparse
+sql_metadata
 requests
 pandas
 tiktoken
 tqdm
 nltk
 flask
+pyserini # for db content index building
