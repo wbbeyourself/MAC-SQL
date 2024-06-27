@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from core.utils import *
+from utils import *
 from core.chat_manager import ChatManager
-from core.utils import get_gold_columns
 from core.const import SYSTEM_NAME
 from tqdm import tqdm
 import time
