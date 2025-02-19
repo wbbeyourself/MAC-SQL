@@ -8,7 +8,8 @@ In this paper, we propose a multi-agent collaborative Text-to-SQL framework MAC-
 
 
 # 🔥 Updates
-- [**2024-04-23**] We have updated the `sql-llama-instruct-v0.5.jsonl` and training scripts in `training_scripts` dir of this project. Please check it out.
+- [**2024-04-23**] We have updated the `sql-llama-instruct-v0.5.jsonl` and training scripts in `training_scripts` dir of this project. Please check it out.Download the `sql-llama-data.zip` from [Baidu Dsik](https://pan.baidu.com/s/1yaEBsSN894O7MlBrckciKw?pwd=htwt) or [Google Drive](https://drive.google.com/file/d/1_3s88Op1PCZo50RsHcx5m2Bj_n05PPn4/view?usp=sharing).
+Unzip `sql-llama-data.zip` and get the data dir, which contains sql-llama-instruct-v0.5.jsonl (3375 instances).
 - [**2024-04-22**] We have updated the [SQL-Llama-v0.5](https://huggingface.co/IceKingBing) model and data.zip (update dev_gold_schema.json in bird and spider) The download links of the updated data are available on [Baidu Disk](https://pan.baidu.com/s/1jU2li3d-enhzswx8VdNYdg?pwd=hfmk) and [Google Drive](https://drive.google.com/file/d/1kkkNJSmJkZKeZyDFUDG7c4mnkxsrr-om/view?usp=sharing).
 - [**2024-02-18**] We have updated the paper, with updates mainly focusing on experiments and framework details, check it out! [link](https://arxiv.org/abs/2312.11242).
 - [**2023-12-26**] We have updated the paper, with updates mainly focusing on the title, abstract, introduction, some details, and appendix. In addition, we give some bad case examples on `bad_cases` folder, check it out!
