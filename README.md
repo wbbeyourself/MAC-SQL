@@ -8,6 +8,7 @@ In this paper, we propose a multi-agent collaborative Text-to-SQL framework MAC-
 
 
 # 🔥 Updates
+- [**2024-11-30**] Our work has been accepted by <span style="color: red;">COLING 2025</span> [conference paper version](https://aclanthology.org/2025.coling-main.36/). Welcome to cite this paper version.
 - [**2024-04-23**] We have updated the `sql-llama-instruct-v0.5.jsonl` and training scripts in `training_scripts` dir of this project. Please check it out.Download the `sql-llama-data.zip` from [Baidu Dsik](https://pan.baidu.com/s/1yaEBsSN894O7MlBrckciKw?pwd=htwt) or [Google Drive](https://drive.google.com/file/d/1_3s88Op1PCZo50RsHcx5m2Bj_n05PPn4/view?usp=sharing).
 Unzip `sql-llama-data.zip` and get the data dir, which contains sql-llama-instruct-v0.5.jsonl (3375 instances).
 - [**2024-04-22**] We have updated the [SQL-Llama-v0.5](https://huggingface.co/IceKingBing) model and data.zip (update dev_gold_schema.json in bird and spider) The download links of the updated data are available on [Baidu Disk](https://pan.baidu.com/s/1jU2li3d-enhzswx8VdNYdg?pwd=hfmk) and [Google Drive](https://drive.google.com/file/d/1kkkNJSmJkZKeZyDFUDG7c4mnkxsrr-om/view?usp=sharing).
@@ -126,13 +127,12 @@ Then, run `run.sh` to start your local inference.
 If you find our work is helpful, please cite as:
 
 ```text
-@misc{wang2024macsql,
-      title={MAC-SQL: A Multi-Agent Collaborative Framework for Text-to-SQL}, 
-      author={Bing Wang and Changyu Ren and Jian Yang and Xinnian Liang and Jiaqi Bai and Linzheng Chai and Zhao Yan and Qian-Wen Zhang and Di Yin and Xing Sun and Zhoujun Li},
-      year={2024},
-      eprint={2312.11242},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
+@inproceedings{macsql-2025,
+  title={MAC-SQL: A Multi-Agent Collaborative Framework for Text-to-SQL},
+  author={Wang, Bing and Ren, Changyu and Yang, Jian and Liang, Xinnian and Bai, Jiaqi and Chai, Linzheng and Yan, Zhao and Zhang, Qian-Wen and Yin, Di and Sun, Xing and others},
+  booktitle={Proceedings of the 31st International Conference on Computational Linguistics},
+  pages={540--557},
+  year={2025}
 }
 ```
 
